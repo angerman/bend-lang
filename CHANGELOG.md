@@ -3,6 +3,12 @@
 Each release names what changed for a user. `bend update` installs the
 latest one; the GitHub release carries the same notes.
 
+## Unreleased
+
+- `DNS.resolve(host)` looks up one IPv4 dotted quad via `getaddrinfo` (C) /
+  `dns.lookup` (JS). Numeric hosts keep the shared no-leading-zero rule;
+  `TCP.connect` stays numeric-only (#846).
+
 ## 2.0.20 (2026-09-20)
 
 - A `U32` match whose arm is a hand-written bit pattern answers that arm:

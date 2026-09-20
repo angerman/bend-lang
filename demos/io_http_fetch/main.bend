@@ -1,5 +1,5 @@
-# HTTP client: a GET to ip-api.com (208.95.112.1: the TCP kit has no
-# DNS) that prints the body of the answer: the status, country, city
+# HTTP client: a GET to ip-api.com (DNS.resolve then TCP.connect) that
+# prints the body of the answer: the status, country, city
 # and IP of the caller. The response is read in two recvs, the second
 # the tail or the EOF of Connection: close. Try it:
 #
@@ -47,7 +47,8 @@ def fetch_sent(m: Socket & Result<&1, &1, U32 & String, Unit>) -> IO(String):
 
 def main() -> IO(Unit):
   do IO<Unit>:
-    c    : Socket <- IO.try(Socket, TCP.connect("208.95.112.1", 80))
+    ip   : String <- IO.try(String, DNS.resolve("ip-api.com"))
+    c    : Socket <- IO.try(Socket, TCP.connect(ip, 80))
     sent : Socket & Result<&1, &1, U32 & String, Unit> <- TCP.send(c, "GET /line/?fields=status,country,city,query HTTP/1.1\r\nHost: ip-api.com\r\nConnection: close\r\n\r\n")
     resp : String <- fetch_sent(sent)
     IO.print(http_body(resp))

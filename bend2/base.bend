@@ -293,6 +293,13 @@ def File.close(file: File) -> IO(Unit):
   import "./effs/file_close.c"
   import "./effs/file_close.js"
 
+# DNS: one IPv4 dotted quad. A numeric host is the shared io_sys_addr /
+# io_addr rule (no leading zeros). A name is getaddrinfo (C) / dns.lookup
+# (JS), so /etc/hosts and search domains apply. TCP.connect stays numeric.
+def DNS.resolve(host: String) -> IO(Result<&1, &1, U32 & String, String>):
+  import "./effs/dns_resolve.c"
+  import "./effs/dns_resolve.js"
+
 def TCP.listen(port: U32) -> IO(Result<&1, &1, U32 & String, Listener>):
   import "./effs/tcp_listen.c"
   import "./effs/tcp_listen.js"
