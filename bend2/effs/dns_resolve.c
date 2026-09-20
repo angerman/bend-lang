@@ -72,6 +72,7 @@ static Term dns_resolve_pack(Env e, IoWork* w) {
 
 Term dns_resolve_run(Env e, Term* f, IoWork* w) {
   struct sockaddr_in at;
+  struct in_addr soft;
   char out[INET_ADDRSTRLEN];
   w->data = io_cstr(e, f[0], &w->size);
   if (io_nul(w->data, w->size) || w->size == 0) {
@@ -86,6 +87,13 @@ Term dns_resolve_run(Env e, Term* f, IoWork* w) {
     }
     free(w->data);
     return io_done(e, io_str(e, out, strlen(out)));
+  }
+  // Hex / short forms (0x7f000001, 127.1): getaddrinfo's inet_aton front
+  // end would accept them; TCP.connect refuses. Keep the shape guard too —
+  // inet_aton rejects 1.2.3.4.5 / 999.1.1.1 that must stay EINVAL.
+  if (inet_aton(w->data, &soft)) {
+    free(w->data);
+    return io_fail(e, EINVAL, NULL);
   }
   if (dns_numeric_shape(w->data)) {
     free(w->data);
